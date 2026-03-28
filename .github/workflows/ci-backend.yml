@@ -1,0 +1,30 @@
+name: CI Backend - Estação Natureza
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  testes-automatizados:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: 📥 Baixar o código do repositório
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Configurar o Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: 📦 Instalar as dependências do projeto
+        run: npm install
+
+      - name: 🧪 Rodar os Testes Automatizados (Jest)
+        run: npm test

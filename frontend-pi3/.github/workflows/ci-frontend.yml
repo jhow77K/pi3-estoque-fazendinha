@@ -1,0 +1,31 @@
+name: CI - Estação Natureza (Front-end)
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+    branches: ["main", "master"]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - name: Baixando o código do repositório
+        uses: actions/checkout@v3
+
+      - name: Configurando o Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: Instalando as dependências (npm install)
+        run: npm ci
+
+      - name: Verificando o TypeScript e compilando (npm run build)
+        run: npm run build
