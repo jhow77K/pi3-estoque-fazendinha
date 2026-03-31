@@ -120,7 +120,7 @@ Para usar a câmera do celular (QR Code), é necessário HTTPS.
 
 Execute:
 
-npx ngrok http 5173
+npx ngrok http 3000
 
 Exemplo de link gerado:
 
