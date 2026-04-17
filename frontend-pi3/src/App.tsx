@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ThemeProvider, useTheme } from './ThemeContext';
 import LandingPage from './pages/Landing.tsx';
 import Login from './pages/Login.tsx';
 import Cadastro from './pages/Cadastro.tsx';
@@ -11,9 +12,11 @@ const LeafLogo = () => (
   </svg>
 );
 
-function App() {
+// Componente interno que USA o tema
+function AppContent() {
+  const { theme, toggleTheme, modoColorblind } = useTheme();
+
   const [logado, setLogado] = useState(!!localStorage.getItem('token'));
-  
   const [telaAtual, setTelaAtual] = useState<'landing' | 'login' | 'cadastro'>('landing');
 
   const fazerLogout = () => {
@@ -23,12 +26,79 @@ function App() {
   };
 
   if (logado) {
-    return <Dashboard onLogout={fazerLogout} />;
+    return (
+      <>
+        {/* BOTÃO DE TOGGLE COLORBLIND - CANTO INFERIOR ESQUERDO */}
+        <div style={{ position: 'fixed', bottom: '20px', left: '20px', zIndex: 9999 }}>
+          <button
+            onClick={toggleTheme}
+            style={{
+              padding: '12px 16px',
+              backgroundColor: modoColorblind ? theme.primaryLight : theme.primary,
+              color: 'white',
+              border: 'none',
+              borderRadius: '50px',
+              cursor: 'pointer',
+              fontSize: '13px',
+              fontWeight: 'bold',
+              transition: 'all 0.3s ease',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              minWidth: '50px',
+              textAlign: 'center'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.padding = '12px 24px';
+              e.currentTarget.style.width = '160px';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.padding = '12px 16px';
+              e.currentTarget.style.width = 'auto';
+            }}
+            title="Alternar para modo colorblind"
+          >
+            {modoColorblind ? '🎨 Normal' : '👁️ Colorblind'}
+          </button>
+        </div>
+        <Dashboard onLogout={fazerLogout} />
+      </>
+    );
   }
 
   return (
-    <div style={{ fontFamily: 'system-ui, -apple-system, sans-serif', backgroundColor: '#fdfdfd', minHeight: '100vh' }}>
-      
+    <div style={{ fontFamily: 'system-ui, -apple-system, sans-serif', backgroundColor: theme.background, minHeight: '100vh' }}>
+
+      {/* BOTÃO DE TOGGLE COLORBLIND - CANTO INFERIOR ESQUERDO */}
+      <div style={{ position: 'fixed', bottom: '20px', left: '20px', zIndex: 9999 }}>
+        <button
+          onClick={toggleTheme}
+          style={{
+            padding: '12px 16px',
+            backgroundColor: modoColorblind ? theme.primaryLight : theme.primary,
+            color: 'white',
+            border: 'none',
+            borderRadius: '50px',
+            cursor: 'pointer',
+            fontSize: '13px',
+            fontWeight: 'bold',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            minWidth: '50px',
+            textAlign: 'center'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.padding = '12px 24px';
+            e.currentTarget.style.width = '160px';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.padding = '12px 16px';
+            e.currentTarget.style.width = 'auto';
+          }}
+          title="Alternar para modo colorblind"
+        >
+          {modoColorblind ? '🎨 Normal' : '👁️ Colorblind'}
+        </button>
+      </div>
+
       {telaAtual === 'landing' && (
         <LandingPage onAcessarSistema={() => setTelaAtual('login')} />
       )}
@@ -37,18 +107,18 @@ function App() {
         <div style={{ paddingTop: '60px' }}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
             <LeafLogo />
-            <h1 style={{ margin: 0, textAlign: 'center', color: '#1b5e20', fontSize: '28px' }}>Estação Natureza</h1>
+            <h1 style={{ margin: 0, textAlign: 'center', color: theme.primary, fontSize: '28px' }}>Estação Natureza</h1>
           </div>
-          
-          <Login 
-            onLoginSucesso={() => setLogado(true)} 
-            onIrParaCadastro={() => setTelaAtual('cadastro')} 
+
+          <Login
+            onLoginSucesso={() => setLogado(true)}
+            onIrParaCadastro={() => setTelaAtual('cadastro')}
           />
-          
+
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <button 
+            <button
               onClick={() => setTelaAtual('landing')}
-              style={{ background: 'none', border: 'none', color: '#757575', cursor: 'pointer', textDecoration: 'underline', fontWeight: '500' }}
+              style={{ background: 'none', border: 'none', color: theme.textSecondary, cursor: 'pointer', textDecoration: 'underline', fontWeight: '500' }}
             >
               Voltar para a página inicial
             </button>
@@ -60,18 +130,18 @@ function App() {
         <div style={{ paddingTop: '60px' }}>
           <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
             <LeafLogo />
-            <h1 style={{ margin: 0, textAlign: 'center', color: '#1b5e20', fontSize: '28px' }}>Estação Natureza</h1>
+            <h1 style={{ margin: 0, textAlign: 'center', color: theme.primary, fontSize: '28px' }}>Estação Natureza</h1>
           </div>
-          
+
           <Cadastro onIrParaLogin={() => setTelaAtual('login')} />
-          
+
           <div style={{ textAlign: 'center', marginTop: '20px' }}>
-             <button 
-               onClick={() => setTelaAtual('landing')}
-               style={{ background: 'none', border: 'none', color: '#757575', cursor: 'pointer', textDecoration: 'underline', fontWeight: '500' }}
-             >
-               Voltar para a página inicial
-             </button>
+            <button
+              onClick={() => setTelaAtual('landing')}
+              style={{ background: 'none', border: 'none', color: theme.textSecondary, cursor: 'pointer', textDecoration: 'underline', fontWeight: '500' }}
+            >
+              Voltar para a página inicial
+            </button>
           </div>
         </div>
       )}
@@ -80,4 +150,11 @@ function App() {
   );
 }
 
-export default App;
+// Componente externo que ENVOLVE com ThemeProvider
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}

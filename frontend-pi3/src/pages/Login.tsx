@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { login } from '../Services/authService.ts';
+import { useTheme } from '../ThemeContext';
 
 interface LoginProps {
   onLoginSucesso: () => void;
@@ -7,6 +8,7 @@ interface LoginProps {
 }
 
 export default function Login({ onLoginSucesso, onIrParaCadastro }: LoginProps) {
+  const { theme } = useTheme();  // ← ADICIONE ISTO!
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [mensagem, setMensagem] = useState('');
@@ -17,9 +19,9 @@ export default function Login({ onLoginSucesso, onIrParaCadastro }: LoginProps) 
 
     try {
       const dados = await login({ email, senha });
-      
+
       localStorage.setItem('token', dados.token);
-      onLoginSucesso(); 
+      onLoginSucesso();
 
     } catch (erro: any) {
       console.error(erro);
@@ -39,17 +41,17 @@ export default function Login({ onLoginSucesso, onIrParaCadastro }: LoginProps) 
           <label>Senha: </label>
           <input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required style={{ width: '100%' }} />
         </div>
-        <button type="submit" style={{ width: '100%', padding: '10px', backgroundColor: '#4CAF50', color: 'white', border: 'none' }}>
+        <button type="submit" style={{ width: '100%', padding: '10px', backgroundColor: theme.primary, color: 'white', border: 'none' }}>
           Entrar
         </button>
       </form>
 
       <div style={{ marginTop: '15px', textAlign: 'center' }}>
-        <button onClick={onIrParaCadastro} style={{ background: 'none', border: 'none', color: '#0066cc', textDecoration: 'underline', cursor: 'pointer' }}>
+        <button onClick={onIrParaCadastro} style={{ background: 'none', border: 'none', color: theme.link, textDecoration: 'underline', cursor: 'pointer' }}>
           Não tem conta? Cadastre-se
         </button>
       </div>
-      
+
       {mensagem && <p style={{ marginTop: '20px', color: mensagem.includes('Erro') ? 'red' : 'green' }}>{mensagem}</p>}
     </div>
   );

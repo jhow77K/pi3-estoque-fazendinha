@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
-import { listarHistorico } from '../Services/produtoService.ts'; 
-import type { Movimentacao } from '../types/index.ts'; 
+import { listarHistorico } from '../Services/produtoService.ts';
+import { useTheme } from '../ThemeContext';
+import type { Movimentacao } from '../types/index.ts';
 
 interface HistoricoProps {
   onVoltar: () => void;
 }
 
 export default function Historico({ onVoltar }: HistoricoProps) {
+  const { theme } = useTheme();
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([]);
   const [erro, setErro] = useState('');
 
