@@ -1,12 +1,14 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { listarLocais, criarLocal, atualizarLocal, excluirLocal } from '../Services/localService.ts'; 
-import type { Local } from '../types/index.ts'; 
+import { listarLocais, criarLocal, atualizarLocal, excluirLocal } from '../Services/localService.ts';
+import { useTheme } from '../ThemeContext';
+import type { Local } from '../types/index.ts';
 
 interface LocaisProps {
   onVoltar: () => void;
 }
 
 export default function Locais({ onVoltar }: LocaisProps) {
+  const { theme } = useTheme();
   const [nomeEstante, setNomeEstante] = useState('');
   const [qtdPrateleiras, setQtdPrateleiras] = useState<number>(1);
   const [locais, setLocais] = useState<Local[]>([]);

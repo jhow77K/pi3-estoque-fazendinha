@@ -1,0 +1,18 @@
+### Cadastrar usuário
+POST http://localhost:3000/api/usuarios/cadastro
+Content-Type: application/json
+
+{
+  "nome": "Admin",
+  "email": "admin@email.com",
+  "senha": "123456"
+}
+
+### Fazer login
+POST http://localhost:3000/api/usuarios/login
+Content-Type: application/json
+
+{
+  "email": "admin@email.com",
+  "senha": "123456"
+}

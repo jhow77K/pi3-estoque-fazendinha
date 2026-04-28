@@ -2,13 +2,16 @@ import { useEffect, useState, useRef } from 'react';
 import { Html5Qrcode } from 'html5-qrcode'; 
 import { listarLocais } from '../Services/localService.ts'; 
 import { listarProdutos, salvarProduto } from '../Services/produtoService.ts'; 
-import type { Local, Produto } from '../types/index.ts'; 
+import { useTheme } from '../ThemeContext';
+import type { Local, Produto } from '../types/index.ts';
 
 interface EntradaProps {
   onVoltar: () => void;
+  onNavigate?: (page: string) => void;
 }
 
-export default function Entrada({ onVoltar }: EntradaProps) {
+export default function Entrada({ onVoltar, onNavigate }: EntradaProps) {
+  const { theme } = useTheme();
   const [codigoLido, setCodigoLido] = useState('');
   const [codigoDigitado, setCodigoDigitado] = useState(''); 
   const [mensagem, setMensagem] = useState('');
@@ -28,6 +31,7 @@ export default function Entrada({ onVoltar }: EntradaProps) {
   const [produtosConhecidos, setProdutosConhecidos] = useState<Produto[]>([]);
   const [modoReposicao, setModoReposicao] = useState(false);
   const [estoqueAtualExistente, setEstoqueAtualExistente] = useState(0);
+  const [showModal, setShowModal] = useState(false);
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
   const hojeISO = new Date().toISOString().split('T')[0];
 
@@ -40,6 +44,11 @@ export default function Entrada({ onVoltar }: EntradaProps) {
         ]);
         setLocais(resLocais);
         setProdutosConhecidos(resProdutos);
+
+        // Verificar se há estantes cadastradas
+        if (resLocais.length === 0) {
+          setShowModal(true);
+        }
 
         const resFornecedores = await fetch('/api/fornecedores');
         if (resFornecedores.ok) {
@@ -200,7 +209,80 @@ export default function Entrada({ onVoltar }: EntradaProps) {
   const quantidadePrateleiras = estanteSelecionada?.quantidade_prateleiras || 1;
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto', fontFamily: 'sans-serif' }}>
+    <>
+      {/* Modal de aviso - Sem estantes */}
+      {showModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '32px',
+            maxWidth: '400px',
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)',
+            textAlign: 'center'
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>🗄️</div>
+            <h2 style={{ margin: '0 0 12px 0', fontSize: '20px', fontWeight: 700, color: '#1c1917' }}>Nenhuma Estante Cadastrada</h2>
+            <p style={{ margin: '0 0 24px 0', color: '#78716c', fontSize: '14px', lineHeight: 1.6 }}>
+              Para registrar uma entrada de produtos, você deve cadastrar pelo menos uma estante primeiro.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '28px' }}>
+              <button
+                onClick={() => { setShowModal(false); onVoltar(); }}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  backgroundColor: '#e7e5df',
+                  color: '#44403c',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#d6d3d1'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#e7e5df'}
+              >
+                Voltar
+              </button>
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  onNavigate?.('locais');
+                }}
+                style={{
+                  flex: 1,
+                  padding: '12px 16px',
+                  backgroundColor: theme.primary,
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                Cadastrar Estante
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto', fontFamily: 'sans-serif' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h2>Registrar Nova Entrada</h2>
         <button onClick={() => { pararCamera(); onVoltar(); }} disabled={salvando} style={{ padding: '8px 12px', cursor: salvando ? 'not-allowed' : 'pointer', backgroundColor: salvando ? '#ccc' : '#f44336', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}>Voltar</button>
@@ -362,6 +444,7 @@ export default function Entrada({ onVoltar }: EntradaProps) {
       {mensagem && (
         <p style={{ marginTop: '20px', padding: '15px', backgroundColor: mensagem.includes('Erro') ? '#ffebee' : '#e8f5e9', color: mensagem.includes('Erro') ? '#c62828' : '#2e7d32', fontWeight: 'bold', borderRadius: '5px', textAlign: 'center' }}>{mensagem}</p>
       )}
-    </div>
+      </div>
+    </>
   );
 }
