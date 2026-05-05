@@ -1,4 +1,3 @@
-import React from 'react';
 import { useTheme } from '../ThemeContext';
 
 interface LandingProps {
@@ -53,9 +52,9 @@ export default function Landing({ onAcessarSistema }: LandingProps) {
     <div style={{ fontFamily: 'system-ui, -apple-system, sans-serif', color: '#333', backgroundColor: '#fff', minHeight: '100vh' }}>
       
       {/*Header*/}
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 50px', backgroundColor: 'white', borderBottom: '1px solid #e0e0e0', position: 'sticky', top: 0, zIndex: 1000 }}>
+      <header className="landing-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '15px 50px', backgroundColor: 'white', borderBottom: '1px solid #e0e0e0', position: 'sticky', top: 0, zIndex: 1000 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <LeafLogo />
+          <LeafLogo color={theme.primary} />
           <h1 style={{ margin: 0, fontSize: '20px', color: theme.primary, fontWeight: 700, letterSpacing: '-0.5px' }}>
             Estação Natureza
           </h1>
@@ -74,7 +73,7 @@ export default function Landing({ onAcessarSistema }: LandingProps) {
       </header>
 
       {/*Hero*/}
-      <section style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '100px 50px', backgroundColor: `${theme.primaryLight}30`, borderBottom: `1px solid ${theme.primaryLight}50` }}>
+      <section className="landing-hero" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '70px 36px', backgroundColor: `${theme.primaryLight}30`, borderBottom: `1px solid ${theme.primaryLight}50` }}>
         <div style={{ maxWidth: '750px' }}>
           <h2 style={{ fontSize: '46px', color: theme.primary, marginBottom: '24px', lineHeight: '1.2', fontWeight: 800, letterSpacing: '-1px' }}>
             Controle Inteligente para o Campo e Armazém
@@ -83,12 +82,6 @@ export default function Landing({ onAcessarSistema }: LandingProps) {
             Modernize a gestão do Estoque. Reduza perdas por validade, organize insumos com precisão e tenha o controle do seu estoque na palma da mão.
           </p>
           <div style={{ display: 'flex', gap: '15px', justifyContent: 'center' }}>
-            <button 
-              onClick={onAcessarSistema}
-              style={{ padding: '16px 36px', backgroundColor: theme.primary, color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px', boxShadow: `0 4px 6px ${theme.primary}33` }}
-            >
-              Iniciar Operação
-            </button>
             <button 
               style={{ padding: '16px 36px', backgroundColor: 'transparent', color: theme.primary, border: `2px solid ${theme.primary}`, borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px' }}
               onClick={() => document.getElementById('funcionalidades')?.scrollIntoView({ behavior: 'smooth' })}
@@ -100,7 +93,7 @@ export default function Landing({ onAcessarSistema }: LandingProps) {
       </section>
 
       {/*Features*/}
-      <section id="funcionalidades" style={{ padding: '80px 50px', backgroundColor: '#fff' }}>
+      <section id="funcionalidades" className="landing-section" style={{ padding: '64px 36px', backgroundColor: '#fff' }}>
         <div style={{ textAlign: 'center', marginBottom: '60px' }}>
           <h3 style={{ fontSize: '32px', color: theme.primary, marginBottom: '12px', fontWeight: 700 }}>
             Tudo o que você precisa em um só lugar
@@ -110,9 +103,9 @@ export default function Landing({ onAcessarSistema }: LandingProps) {
           </p>
         </div>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '30px', maxWidth: '1200px', margin: '0 auto' }}>
+        <div className="features-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '30px', maxWidth: '1200px', margin: '0 auto' }}>
           {features.map((feature, index) => (
-            <div key={index} style={{ backgroundColor: '#fff', padding: '35px 30px', borderRadius: '12px', border: '1px solid #e0e0e0', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', transition: 'transform 0.2s, box-shadow 0.2s' }}
+            <div key={index} className="feature-card" style={{ backgroundColor: '#fff', padding: '35px 30px', borderRadius: '12px', border: '1px solid #e0e0e0', boxShadow: '0 4px 12px rgba(0,0,0,0.03)', transition: 'transform 0.2s, box-shadow 0.2s' }}
               onMouseOver={(e) => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = `0 8px 24px ${theme.primary}22`; }}
               onMouseOut={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.03)'; }}
             >
@@ -126,21 +119,21 @@ export default function Landing({ onAcessarSistema }: LandingProps) {
         </div>
       </section>
 
-      <section style={{ padding: '80px 50px', textAlign: 'center', backgroundColor: theme.primary, color: '#fff' }}>
+      <section className="landing-cta" style={{ padding: '64px 36px', textAlign: 'center', backgroundColor: theme.primary, color: '#fff' }}>
         <h3 style={{ fontSize: '32px', marginBottom: '16px', fontWeight: 700 }}>Pronto para organizar o Estoque?</h3>
         <p style={{ fontSize: '18px', marginBottom: '40px', color: '#c8e6c9', fontWeight: 400 }}>
           Junte-se a nós e comece a controlar seu estoque de forma profissional e eficiente hoje mesmo.
         </p>
         <button 
           onClick={onAcessarSistema}
-          style={{ padding: '16px 48px', backgroundColor: '#fff', color: '#1b5e20', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px', boxShadow: '0 4px 8px rgba(0,0,0,0.2)' }}
+          style={{ padding: '16px 48px', backgroundColor: '#fff', color: theme.primaryDark, border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px', boxShadow: '0 4px 8px rgba(0,0,0,0.2)' }}
         >
           Acessar o Sistema
         </button>
       </section>
 
       {/*Footer*/}
-      <footer style={{ padding: '30px 50px', textAlign: 'center', backgroundColor: '#fafafa', borderTop: '1px solid #eeeeee', color: '#9e9e9e' }}>
+      <footer className="landing-footer" style={{ padding: '24px 36px', textAlign: 'center', backgroundColor: '#fafafa', borderTop: '1px solid #eeeeee', color: '#9e9e9e' }}>
         <p style={{ margin: 0, fontSize: '14px', fontWeight: 500 }}>&copy; 2026 Todos os Direitos Reservados.</p>
         <p style={{ margin: '6px 0 0 0', fontSize: '13px' }}>Desenvolvido pelos alunos da UNIVESP.</p>
       </footer>

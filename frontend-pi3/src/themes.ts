@@ -2,6 +2,7 @@ interface Theme {
   primary: string;
   primaryDark: string;
   primaryLight: string;
+  headerHover: string;
   background: string;
   textPrimary: string;
   textSecondary: string;
@@ -15,6 +16,7 @@ const themePadrao: Theme = {
   primary: '#0061ff',       // Azul profissional vibrante (estilo SaaS corporativo)
   primaryDark: '#004ecb',   // Azul profundo para hover
   primaryLight: '#e6f0ff',  // Fundo de destaque muito suave
+  headerHover: '#004ecb',   // Hover de menu com contraste alto
   background: '#ffffff',    // Branco puro para máxima clareza
   textPrimary: '#1e293b',   // Slate-800: Cinza azulado escuro para leitura confortável
   textSecondary: '#64748b', // Slate-500: Para informações de suporte
@@ -29,6 +31,7 @@ const themeColorblind: Theme = {
   primary: '#218bff',       // Azul de alta visibilidade
   primaryDark: '#0550ae',   // Azul marinho para contraste severo
   primaryLight: '#c2e0ff',  // Azul celeste claro
+  headerHover: '#0550ae',   // Hover de menu com contraste alto
   background: '#f6f8fa',    // Cinza muito claro (estilo GitHub/Azure)
   textPrimary: '#1f2328',   // Quase preto para nitidez máxima
   textSecondary: '#656d76', // Cinza com contraste testado para acessibilidade

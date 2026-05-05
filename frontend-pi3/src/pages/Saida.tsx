@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { Html5Qrcode } from 'html5-qrcode';
 import { listarProdutos, registrarSaida } from '../Services/produtoService.ts';
 import { useTheme } from '../ThemeContext';
 import type { Produto } from '../types/index.ts';
@@ -14,12 +15,17 @@ export default function Saida({ onVoltar, onNavigate }: SaidaProps) {
   const [tipoMensagem, setTipoMensagem] = useState<'sucesso' | 'erro' | ''>('');
   const [showModal, setShowModal] = useState(false);
   const [buscaTermo, setBuscaTermo] = useState('');
+  const [cameraAtiva, setCameraAtiva] = useState(false);
+  const [mensagemCamera, setMensagemCamera] = useState('');
+  const [mostrarBuscaManual, setMostrarBuscaManual] = useState(false);
+  const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
   
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [carregando, setCarregando] = useState(false);
 
   useEffect(() => {
     carregarProdutos();
+    return () => { pararCamera(); };
   }, []);
 
   const carregarProdutos = async () => {
@@ -42,6 +48,48 @@ export default function Saida({ onVoltar, onNavigate }: SaidaProps) {
     p.nome.toLowerCase().includes(buscaTermo.toLowerCase()) ||
     p.codigo_barras.includes(buscaTermo)
   );
+
+  const iniciarCamera = () => {
+    setMostrarBuscaManual(false);
+    setBuscaTermo('');
+    setCameraAtiva(true);
+    setMensagemCamera('');
+
+    setTimeout(async () => {
+      try {
+        const html5QrCode = new Html5Qrcode('leitor-camera-saida');
+        html5QrCodeRef.current = html5QrCode;
+
+        await html5QrCode.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 240, height: 240 } },
+          (textoDecodificado) => {
+            setBuscaTermo(textoDecodificado.trim());
+            pararCamera();
+          },
+          () => {}
+        );
+      } catch (err: any) {
+        console.error(err);
+        setMensagemCamera('Erro ao acessar câmera. Verifique as permissões.');
+        setCameraAtiva(false);
+      }
+    }, 200);
+  };
+
+  const pararCamera = () => {
+    if (html5QrCodeRef.current) {
+      try {
+        html5QrCodeRef.current.stop().then(() => {
+          html5QrCodeRef.current?.clear();
+          html5QrCodeRef.current = null;
+        }).catch(console.error);
+      } catch (err) {
+        console.error('Erro ao parar câmera', err);
+      }
+    }
+    setCameraAtiva(false);
+  };
 
   const handleRetirada = async (produto: Produto) => {
     if (produto.quantidade_atual < 1) {
@@ -163,9 +211,9 @@ export default function Saida({ onVoltar, onNavigate }: SaidaProps) {
         {mensagem && (
           <div style={{
             padding: '14px 16px',
-            backgroundColor: tipoMensagem === 'sucesso' ? '#f0fdf4' : '#fef2f2',
-            color: tipoMensagem === 'sucesso' ? '#166534' : '#991b1b',
-            border: `1px solid ${tipoMensagem === 'sucesso' ? '#86efac' : '#fecaca'}`,
+            backgroundColor: tipoMensagem === 'sucesso' ? `${theme.success}1a` : `${theme.danger}1a`,
+            color: tipoMensagem === 'sucesso' ? theme.success : theme.danger,
+            border: `1px solid ${tipoMensagem === 'sucesso' ? theme.success : theme.danger}`,
             borderRadius: '8px',
             marginBottom: '24px',
             fontWeight: '500',
@@ -175,7 +223,7 @@ export default function Saida({ onVoltar, onNavigate }: SaidaProps) {
           </div>
         )}
 
-        {/* Barra de Busca */}
+        {/* Câmera e Busca */}
         <div style={{
           backgroundColor: 'white',
           padding: '20px',
@@ -184,24 +232,97 @@ export default function Saida({ onVoltar, onNavigate }: SaidaProps) {
           marginBottom: '28px',
           boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
         }}>
-          <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#44403c', marginBottom: '10px' }}>
-            🔍 Buscar Produto
-          </label>
-          <input
-            type="text"
-            value={buscaTermo}
-            onChange={(e) => setBuscaTermo(e.target.value)}
-            placeholder="Digite o nome ou código do produto..."
-            style={{
-              width: '100%',
-              padding: '12px 14px',
-              border: '1px solid #e7e5df',
-              borderRadius: '8px',
-              fontSize: '14px',
-              boxSizing: 'border-box',
-              fontFamily: 'inherit'
-            }}
-          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '12px' }}>
+            <span style={{ fontSize: '14px', fontWeight: '600', color: '#44403c' }}>
+              📷 Câmera (prioritário)
+            </span>
+            <button
+              onClick={() => cameraAtiva ? pararCamera() : iniciarCamera()}
+              style={{
+                padding: '8px 12px',
+                backgroundColor: cameraAtiva ? theme.danger : theme.primary,
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 700,
+                fontSize: '13px'
+              }}
+            >
+              {cameraAtiva ? 'Fechar câmera' : 'Usar câmera'}
+            </button>
+          </div>
+
+          {cameraAtiva && (
+            <div style={{ marginBottom: '16px' }}>
+              <div
+                id="leitor-camera-saida"
+                className="camera-preview"
+                style={{
+                  width: '100%',
+                  maxWidth: '520px',
+                  aspectRatio: '1 / 1',
+                  margin: '0 auto',
+                  backgroundColor: '#0f172a',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  border: `2px solid ${theme.primary}`
+                }}
+              />
+              {mensagemCamera && (
+                <div style={{ marginTop: '10px', fontSize: '13px', color: theme.danger, fontWeight: 600 }}>{mensagemCamera}</div>
+              )}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: cameraAtiva ? '8px' : '0' }}>
+            <button
+              onClick={() => {
+                setMostrarBuscaManual((prev) => {
+                  const proximo = !prev;
+                  if (!proximo) {
+                    setBuscaTermo('');
+                  }
+                  return proximo;
+                });
+              }}
+              style={{
+                padding: '6px 10px',
+                backgroundColor: 'transparent',
+                color: theme.primary,
+                border: `1px solid ${theme.primary}`,
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontWeight: 700,
+                fontSize: '12px'
+              }}
+            >
+              {mostrarBuscaManual ? 'Ocultar busca manual' : 'Buscar manualmente'}
+            </button>
+          </div>
+
+          {mostrarBuscaManual && (
+            <div style={{ marginTop: '12px' }}>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', color: '#44403c', marginBottom: '8px' }}>
+                🔍 Busca manual (alternativa)
+              </label>
+              <input
+                type="text"
+                value={buscaTermo}
+                onChange={(e) => setBuscaTermo(e.target.value)}
+                placeholder="Digite o nome ou código do produto..."
+                style={{
+                  width: '100%',
+                  padding: '12px 14px',
+                  border: '1px solid #e7e5df',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  boxSizing: 'border-box',
+                  fontFamily: 'inherit'
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* Tabela de Produtos */}
@@ -256,8 +377,8 @@ export default function Saida({ onVoltar, onNavigate }: SaidaProps) {
                         <span style={{
                           display: 'inline-block',
                           padding: '6px 12px',
-                          backgroundColor: produto.quantidade_atual < 5 ? '#fef2f2' : '#f0fdf4',
-                          color: produto.quantidade_atual < 5 ? '#991b1b' : '#166534',
+                          backgroundColor: produto.quantidade_atual < 5 ? `${theme.danger}1a` : `${theme.success}1a`,
+                          color: produto.quantidade_atual < 5 ? theme.danger : theme.success,
                           borderRadius: '6px',
                           fontWeight: '600',
                           fontSize: '13px'
