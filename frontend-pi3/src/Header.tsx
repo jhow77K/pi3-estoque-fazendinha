@@ -1,9 +1,9 @@
 import { useTheme } from './ThemeContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface HeaderProps {
   paginaAtual: string;
-  onNavigate: (pagina: string) => void;
+  onNavigate: (pagina: any) => void;
   onLogout: () => void;
 }
 
@@ -17,6 +17,8 @@ const LeafLogo = ({ color }: { color: string }) => (
 export default function Header({ paginaAtual, onNavigate, onLogout }: HeaderProps) {
   const { theme } = useTheme();
   const [menuAberto, setMenuAberto] = useState(false);
+  const [isDesktop, setIsDesktop] = useState<boolean>(() => typeof window !== 'undefined' ? window.innerWidth >= 768 : true);
+  const [menuMovimentarAberto, setMenuMovimentarAberto] = useState(false);
 
   const opcoes = [
     { id: 'lista', label: '📦 Produtos' },
@@ -28,7 +30,16 @@ export default function Header({ paginaAtual, onNavigate, onLogout }: HeaderProp
   const handleNavegar = (pagina: string) => {
     onNavigate(pagina);
     setMenuAberto(false);
+    setMenuMovimentarAberto(false);
   };
+
+  // monitor window size to switch between mobile/desktop menus
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handler = () => setIsDesktop(window.innerWidth >= 768);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
 
   return (
     <header style={{
@@ -57,13 +68,13 @@ export default function Header({ paginaAtual, onNavigate, onLogout }: HeaderProp
 
       {/* Menu Desktop */}
       <nav style={{ 
-        display: 'none',
+        display: isDesktop ? 'flex' : 'none',
         gap: '8px', 
         alignItems: 'center', 
         flex: 1, 
         justifyContent: 'center', 
         flexWrap: 'wrap',
-        '@media (min-width: 768px)': { display: 'flex' }
+        position: 'relative'
       }}>
         {opcoes.map(opcao => (
           <button
@@ -71,9 +82,9 @@ export default function Header({ paginaAtual, onNavigate, onLogout }: HeaderProp
             onClick={() => handleNavegar(opcao.id)}
             style={{
               padding: '8px 14px',
-              backgroundColor: paginaAtual === opcao.id ? theme.primaryLight : 'transparent',
+              backgroundColor: paginaAtual === opcao.id ? theme.headerHover : 'transparent',
               color: 'white',
-              border: `2px solid ${paginaAtual === opcao.id ? theme.primaryLight : 'transparent'}`,
+              border: `2px solid ${paginaAtual === opcao.id ? theme.headerHover : 'transparent'}`,
               borderRadius: '6px',
               cursor: 'pointer',
               fontWeight: paginaAtual === opcao.id ? 'bold' : '500',
@@ -83,25 +94,111 @@ export default function Header({ paginaAtual, onNavigate, onLogout }: HeaderProp
             }}
             onMouseEnter={(e) => {
               if (paginaAtual !== opcao.id) {
-                e.currentTarget.style.backgroundColor = `${theme.primaryLight}33`;
+                e.currentTarget.style.backgroundColor = theme.headerHover;
+                e.currentTarget.style.color = 'white';
+                e.currentTarget.style.borderColor = theme.headerHover;
               }
             }}
             onMouseLeave={(e) => {
               if (paginaAtual !== opcao.id) {
                 e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = 'white';
+                e.currentTarget.style.borderColor = 'transparent';
               }
             }}
           >
             {opcao.label}
           </button>
         ))}
+
+        <div style={{ position: 'relative' }}>
+          <button
+            onClick={() => setMenuMovimentarAberto((prev) => !prev)}
+            style={{
+              padding: '8px 14px',
+              backgroundColor: menuMovimentarAberto ? theme.headerHover : 'transparent',
+              color: 'white',
+              border: `2px solid ${menuMovimentarAberto ? theme.headerHover : 'transparent'}`,
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: '600',
+              fontSize: '13px',
+              transition: 'all 0.2s',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            Movimentar ▾
+          </button>
+
+          {menuMovimentarAberto && (
+            <div style={{
+              position: 'absolute',
+              top: 'calc(100% + 8px)',
+              left: 0,
+              backgroundColor: theme.primary,
+              border: `1px solid ${theme.headerHover}`,
+              borderRadius: '10px',
+              boxShadow: '0 12px 24px rgba(15,23,42,0.2)',
+              padding: '8px',
+              minWidth: '180px',
+              zIndex: 200
+            }}>
+              <button
+                onClick={() => handleNavegar('entrada')}
+                style={{
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '10px 12px',
+                  backgroundColor: 'transparent',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontSize: '13px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = theme.headerHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                ➕ Entrada
+              </button>
+              <button
+                onClick={() => handleNavegar('saida')}
+                style={{
+                  width: '100%',
+                  textAlign: 'left',
+                  padding: '10px 12px',
+                  backgroundColor: 'transparent',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  fontSize: '13px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = theme.headerHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                ➖ Saída
+              </button>
+            </div>
+          )}
+        </div>
       </nav>
 
       {/* Menu Hamburger Mobile */}
       <button
         onClick={() => setMenuAberto(!menuAberto)}
         style={{
-          display: 'flex',
+          display: isDesktop ? 'none' : 'flex',
           flexDirection: 'column',
           gap: '4px',
           backgroundColor: 'transparent',
@@ -117,31 +214,27 @@ export default function Header({ paginaAtual, onNavigate, onLogout }: HeaderProp
       </button>
 
       {/* Botão Logout Desktop */}
-      <button
-        onClick={onLogout}
-        style={{
-          display: 'none',
-          padding: '8px 16px',
-          backgroundColor: 'transparent',
-          color: 'white',
-          border: '2px solid white',
-          borderRadius: '6px',
-          cursor: 'pointer',
-          fontWeight: 'bold',
-          fontSize: '13px',
-          transition: 'all 0.2s',
-          whiteSpace: 'nowrap',
-          '@media (min-width: 768px)': { display: 'block' }
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'transparent';
-        }}
-      >
-        Sair
-      </button>
+      {isDesktop ? (
+        <button
+          onClick={onLogout}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: 'transparent',
+            color: 'white',
+            border: '2px solid white',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '13px',
+            transition: 'all 0.2s',
+            whiteSpace: 'nowrap'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.2)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}
+        >
+          Sair
+        </button>
+      ) : null}
 
       {/* Menu Mobile */}
       {menuAberto && (
@@ -164,7 +257,7 @@ export default function Header({ paginaAtual, onNavigate, onLogout }: HeaderProp
               onClick={() => handleNavegar(opcao.id)}
               style={{
                 padding: '12px 14px',
-                backgroundColor: paginaAtual === opcao.id ? theme.primaryLight : 'transparent',
+                backgroundColor: paginaAtual === opcao.id ? theme.headerHover : 'transparent',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
@@ -176,18 +269,52 @@ export default function Header({ paginaAtual, onNavigate, onLogout }: HeaderProp
               }}
               onMouseEnter={(e) => {
                 if (paginaAtual !== opcao.id) {
-                  e.currentTarget.style.backgroundColor = `${theme.primaryLight}33`;
+                  e.currentTarget.style.backgroundColor = theme.headerHover;
+                  e.currentTarget.style.color = 'white';
                 }
               }}
               onMouseLeave={(e) => {
                 if (paginaAtual !== opcao.id) {
                   e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = 'white';
                 }
               }}
             >
               {opcao.label}
             </button>
           ))}
+          <button
+            onClick={() => handleNavegar('entrada')}
+            style={{
+              padding: '12px 14px',
+              backgroundColor: 'transparent',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 600,
+              fontSize: '14px',
+              textAlign: 'left'
+            }}
+          >
+            ➕ Entrada
+          </button>
+          <button
+            onClick={() => handleNavegar('saida')}
+            style={{
+              padding: '12px 14px',
+              backgroundColor: 'transparent',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 600,
+              fontSize: '14px',
+              textAlign: 'left'
+            }}
+          >
+            ➖ Saída
+          </button>
           <button
             onClick={() => { onLogout(); setMenuAberto(false); }}
             style={{
