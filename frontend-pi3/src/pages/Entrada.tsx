@@ -320,7 +320,7 @@ export default function Entrada({ onVoltar, onNavigate }: EntradaProps) {
               {!cameraAtiva && (
                 <div style={{ padding: '40px 20px', backgroundColor: '#f5f5f5', borderRadius: '8px', border: '2px dashed #ccc' }}>
                   <p style={{ color: '#666', marginBottom: '20px' }}>Toque no botão abaixo para ligar a câmera traseira do seu dispositivo.</p>
-                  <button onClick={iniciarCamera} style={{ padding: '15px 30px', backgroundColor: '#4d7c0f', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px' }}>
+                  <button onClick={iniciarCamera} style={{ padding: '15px 30px', backgroundColor: '#666', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px' }}>
                     Ligar Câmera
                   </button>
                 </div>

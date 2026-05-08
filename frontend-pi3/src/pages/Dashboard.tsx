@@ -280,7 +280,7 @@ function Dashboard({ onLogout }: DashboardProps) {
                   <div style={{ marginBottom: '20px' }}>
                     <h3 style={{ margin: '0 0 12px 0', fontSize: '20px', color: '#292524', fontWeight: '800', lineHeight: '1.2' }}>{p.nome}</h3>
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                      <span style={{ fontSize: '32px', fontWeight: '900', color: alertaEstoque ? '#c2410c' : '#3f6212', lineHeight: '1' }}>
+                      <span style={{ fontSize: '32px', fontWeight: '900', color: alertaEstoque ? '#c2410c' : '#000000', lineHeight: '1' }}>
                         {p.quantidade_atual}
                       </span>
                       <span style={{ color: '#a8a29e', fontWeight: '600', fontSize: '14px' }}>em estoque</span>

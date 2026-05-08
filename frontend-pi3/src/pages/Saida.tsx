@@ -234,7 +234,7 @@ export default function Saida({ onVoltar, onNavigate }: SaidaProps) {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '12px' }}>
             <span style={{ fontSize: '14px', fontWeight: '600', color: '#44403c' }}>
-              📷 Câmera (prioritário)
+              📷 Câmera
             </span>
             <button
               onClick={() => cameraAtiva ? pararCamera() : iniciarCamera()}

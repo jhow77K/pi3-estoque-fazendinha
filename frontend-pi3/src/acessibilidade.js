@@ -1,4 +1,3 @@
-
 function lerTextoSelecionado() {
   const texto = window.getSelection().toString();
 
@@ -20,10 +19,16 @@ botao.style.bottom = "20px";
 botao.style.right = "20px";
 botao.style.zIndex = "9999";
 
-botao.style.backgroundColor = "#003f5c";
-botao.style.color = "#ffffff"
-
+// Estilização padronizada com o projeto
+botao.style.backgroundColor = "#0d6efd"; // Azul vibrante no padrão do projeto
+botao.style.color = "#ffffff";
 botao.style.border = "none";
+botao.style.borderRadius = "50px"; // Bordas arredondadas (estilo pílula)
+botao.style.padding = "10px 20px"; // Espaçamento interno para não colar no texto
+botao.style.fontWeight = "bold"; // Deixa a fonte mais forte
+botao.style.fontFamily = "inherit"; // Herda a fonte (provavelmente Inter ou Roboto) do projeto
+botao.style.cursor = "pointer"; // Muda o cursor para a mãozinha ao passar o mouse
+botao.style.boxShadow = "0 4px 6px rgba(0,0,0,0.1)"; // Leve sombra para destacar o botão flutuante
 
 botao.onclick = lerTextoSelecionado;
 
